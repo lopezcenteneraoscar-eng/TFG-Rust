@@ -1,0 +1,46 @@
+module productoEscalar (
+    input clk,              // Reloj
+    input reset,            // Reset asincrónico
+    input start,            // Señal de inicio del cálculo
+    input [7:0] a,          // Entrada A (un solo elemento del vector)
+    input [7:0] b,          // Entrada B (un solo elemento del vector)
+    input valid,            // Señal de validez de los datos
+    output reg [15:0] result, // Resultado acumulado del producto escalar
+    output reg busy         // Indica si el módulo está ocupado
+);
+
+    reg [15:0] accumulator;  // Acumulador para el resultado del producto escalar
+    reg [3:0] counter;      // Contador de ciclos
+    reg [3:0] max_count;    // Número de ciclos (tamaño del vector - 1)
+
+    // Lógica para resetear y manejar el cálculo
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            accumulator <= 0;        // Reinicia el acumulador
+            counter <= 0;            // Reinicia el contador
+            result <= 0;             // Reinicia el resultado
+            busy <= 0;               // No está ocupado al inicio
+            max_count <= 4;          // Número de ciclos para 4 elementos
+        end
+        else if (start && !busy) begin
+            // Si se inicia el cálculo, configuramos el producto escalar
+            busy <= 1;
+            accumulator <= 0;       // Inicializamos el acumulador
+            counter <= 0;           // Inicializamos el contador
+            result <= 0;            // Inicializamos el resultado
+        end
+        else if (busy) begin
+            if (valid) begin
+                // Calculamos el producto de a y b y lo acumulamos
+                accumulator <= accumulator + (a * b);
+                counter <= counter + 1; // Incrementamos el contador
+                //$monitor("%5d", accumulator);
+                // Comprobamos si hemos llegado al final de la secuencia
+                if (counter == max_count) begin
+                    result <= accumulator; // Guardamos el resultado final
+                    busy <= 0;              // Terminamos el cálculo
+                end
+            end
+        end
+    end
+endmodule
