@@ -1,0 +1,52 @@
+$date
+	Sun May 18 20:27:31 2025
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module tb_sumadorVerilog $end
+$var wire 9 ! sum [8:0] $end
+$var reg 8 " a [7:0] $end
+$var reg 8 # b [7:0] $end
+$scope module uut $end
+$var wire 8 $ a [7:0] $end
+$var wire 8 % b [7:0] $end
+$var wire 9 & sum [8:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b11110 &
+b10100 %
+b1010 $
+b10100 #
+b1010 "
+b11110 !
+$end
+#10
+b1001011 #
+b1001011 %
+b11001 !
+b11001 &
+b11001110 "
+b11001110 $
+#20
+b110011100 !
+b110011100 &
+b11001110 #
+b11001110 %
+#30
+b10000001 #
+b10000001 %
+b0 !
+b0 &
+b1111111 "
+b1111111 $
+#50

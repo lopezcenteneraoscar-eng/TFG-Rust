@@ -1,0 +1,10 @@
+[package]
+name = "sumador"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rust-hdl = "0.46.0"
+rust-hdl-core = "0.46.0"
+anyhow = "1.0"
+
