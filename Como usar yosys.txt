@@ -1,0 +1,18 @@
+Como usar Yosys
+
+Te vas al directorio que te interese con los comandos cd
+
+pones yosys
+
+//Comandos de yosys
+
+read_verilog nombre.v  -> lee nuestro fichero verilog
+
+synth     ->genera las puertas que necesita para realizar la operacion
+
+show 
+show -format dot -prefix simple  -> Esto genera un fichero .dot con la estructura generada por la synth
+
+write_json adderSynth.json
+
+write_blif adderSynth.blif

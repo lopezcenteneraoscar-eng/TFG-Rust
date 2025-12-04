@@ -1,0 +1,235 @@
+# Manual de Instalación y Uso de Rust, Rust-HDL, Yosys y Herramientas Relacionadas en Ubuntu 24
+
+Este documento te guiará paso a paso en la instalación y uso de Rust, Rust-HDL, Yosys, GTKWave, y otras herramientas necesarias para simular y analizar diseños HDL en Ubuntu 24. Se asume que partes de un sistema limpio.
+
+---
+
+## 1. Instalación de Rust
+Rust es un lenguaje de programación utilizado para manejar Rust-HDL. Sigue estos pasos:
+
+1. Abre una terminal.
+2. Ejecuta el siguiente comando para descargar e instalar Rust:
+
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
+
+3. Sigue las instrucciones en pantalla. Si te pide confirmar la instalación, escribe `1` (opción predeterminada).
+4. Una vez completado, reinicia la terminal o ejecuta:
+
+   ```bash
+   source $HOME/.cargo/env
+   ```
+
+5. Verifica la instalación:
+
+   ```bash
+   rustc --version
+   ```
+
+Deberías ver un número de versión, lo que indica que Rust está correctamente instalado.
+
+---
+
+## 2. Instalación de Rust-HDL
+Rust-HDL es una biblioteca para simular diseños HDL.
+
+1. Ubícate en el directorio donde quieras trabajar. Si no sabes dónde, crea un directorio nuevo:
+
+   ```bash
+   mkdir ~/rust_hdl_projects
+   cd ~/rust_hdl_projects
+   ```
+
+2. Crea un nuevo proyecto Rust:
+
+   ```bash
+   cargo new my_rust_hdl_project
+   cd my_rust_hdl_project
+   ```
+
+3. Instala Rust-HDL en este proyecto:
+
+   ```bash
+   cargo add rust-hdl@0.46.0
+   ```
+
+Si encuentras un error relacionado con `Cargo.toml`, verifica que estás en el directorio del proyecto creado y repite el comando.
+
+---
+
+## 3. Instalación de GTKWave
+GTKWave es una herramienta para visualizar archivos de simulación.
+
+1. Instala GTKWave ejecutando:
+
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y gtkwave
+   ```
+
+2. Verifica la instalación ejecutando:
+
+   ```bash
+   gtkwave --version
+   ```
+
+Deberías ver un mensaje con la versión instalada.
+
+---
+
+## 4. Instalación de Inkscape
+Inkscape se usa para visualizar archivos SVG generados durante las simulaciones.
+
+1. Instala Inkscape ejecutando:
+
+   ```bash
+   sudo apt-get install -y inkscape
+   ```
+
+2. Para visualizar un archivo SVG, puedes usar:
+
+   ```bash
+   inkview file.svg
+   ```
+
+---
+
+## 5. Instalación de Yosys
+Yosys es un sintetizador lógico para HDL.
+
+1. Instala dependencias necesarias:
+
+   ```bash
+   sudo apt-get install -y build-essential clang bison flex libreadline-dev gawk tcl-dev libffi-dev git graphviz xdot pkg-config python3 libboost-system-dev libboost-python-dev libboost-filesystem-dev
+   ```
+
+2. Clona el repositorio de Yosys:
+
+   ```bash
+   git clone https://github.com/YosysHQ/yosys.git
+   cd yosys
+   ```
+
+3. Compila e instala:
+
+   ```bash
+   make config-clang
+   make -j$(nproc)
+   sudo make install
+   ```
+
+4. Verifica la instalación:
+
+   ```bash
+   yosys -V
+   ```
+
+Deberías ver la versión instalada.
+
+---
+
+## 6. Uso y Ejecución de Simulaciones
+
+### 6.1. Compilación y Simulación con Rust-HDL
+
+1. Ve al directorio de tu proyecto Rust:
+
+   ```bash
+   cd ~/rust_hdl_projects/my_rust_hdl_project
+   ```
+
+2. Abre el archivo `src/main.rs` y escribe tu código HDL. Por ejemplo:
+
+   ```rust
+   use rust_hdl::prelude::*;
+
+   #[derive(LogicBlock)]
+   struct MyModule {
+       pub clock: Signal<In, Clock>,
+       pub reset: Signal<In, Bit>,
+       pub output: Signal<Out, Bits<8>>,
+   }
+
+   impl Default for MyModule {
+       fn default() -> Self {
+           Self {
+               clock: Default::default(),
+               reset: Default::default(),
+               output: Default::default(),
+           }
+       }
+   }
+
+   impl Logic for MyModule {
+       #[hdl_gen]
+       fn update(&mut self) {
+           self.output.next = self.reset.val().into();
+       }
+   }
+
+   fn main() {
+       let mut uut = MyModule::default();
+       generate_verilog(&uut, "my_module.v");
+   }
+   ```
+
+3. Compila y genera el código Verilog:
+
+   ```bash
+   cargo run
+   ```
+
+   Esto creará un archivo `my_module.v` con el código Verilog correspondiente.
+
+### 6.2. Sintetizar con Yosys
+
+1. Asegúrate de tener el archivo `my_module.v` generado por Rust-HDL.
+2. Abre Yosys en la terminal:
+
+   ```bash
+   yosys
+   ```
+
+3. En el modo interactivo de Yosys, sintetiza el archivo Verilog:
+
+   ```bash
+   read_verilog my_module.v
+   synth
+   show
+   ```
+
+   Esto leerá el archivo Verilog, realizará la síntesis y mostrará el esquema del diseño.
+
+4. Opcionalmente, guarda el archivo sintetizado en formato BLIF:
+
+   ```bash
+   write_blif my_module.blif
+   ```
+
+5. Para salir de Yosys, escribe:
+
+   ```bash
+   exit
+   ```
+
+### 6.3. Visualización de Resultados SVG
+
+1. Si tu simulación genera un archivo `.svg`, puedes abrirlo con:
+
+   ```bash
+   inkview file.svg
+   ```
+
+### 6.4. Ver Resultados en GTKWave
+
+1. Abre el archivo `.vcd` generado por tu simulación:
+
+   ```bash
+   gtkwave file.vcd
+   ```
+
+2. Desde la interfaz, añade las señales para observar la simulación.
+
+
+

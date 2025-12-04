@@ -1,0 +1,6 @@
+Usar iverilog para compilacion y prueba de codigo .v y testbench.v
+
+El comando es 
+iverilog -o prueba mySumador.v sumador_tb.v
+vvp prueba
+
